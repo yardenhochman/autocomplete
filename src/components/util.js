@@ -5,3 +5,5 @@ export const fetchSearchOptionsAutocomplete = searchText =>
 
 export const includesText = searchText => entry =>
   entry.term.toLowerCase().includes(searchText.toLowerCase());
+
+export const whenEnterIsPressed = fn => ({ which }) => which === 13 && fn();
