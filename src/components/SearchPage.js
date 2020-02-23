@@ -5,7 +5,7 @@ import {
   includesText,
   whenEnterIsPressed,
 } from './util';
-import { SearchBar, Page, SuggestionList, Suggestion } from './style';
+import { SearchBar, Page, SuggestionList, SuggestionItem } from './style';
 import BoldMatchingText from './SuggestionText';
 
 function Search() {
@@ -21,15 +21,12 @@ function Search() {
     focusSearch();
   }, []);
 
-  const fetchSuggestions = useCallback(
-    debounce(async value => {
-      const { data: listOfTermObjects } = await fetchSearchOptionsAutocomplete(
-        value,
-      );
-      setResults(listOfTermObjects.filter(includesText(value)));
-    }, 300),
-    [],
-  );
+  const fetchSuggestions = debounce(async value => {
+    const { data: listOfTermObjects } = await fetchSearchOptionsAutocomplete(
+      value,
+    );
+    setResults(listOfTermObjects.filter(includesText(value)));
+  }, 300);
 
   const onChange = ({ target: { value } }) => {
     setSearchText(value);
@@ -53,7 +50,9 @@ function Search() {
     focusSearch();
   };
 
-  const SuggestionText = BoldMatchingText(searchText);
+  const SuggestionText = useCallback(() => BoldMatchingText(searchText), [
+    results,
+  ]);
 
   return (
     <Page>
@@ -66,16 +65,16 @@ function Search() {
       {showResults && (
         <SuggestionList>
           {results.map(({ resultCount, term }) => {
-            const selectTerm = () =>
-              selectSuggestion(`${term} (${resultCount})`);
+            const Suggest = SuggestionText();
+            const suggestionText = `${term} (${resultCount})`;
+            const selectTerm = () => selectSuggestion(suggestionText);
             return (
-              <Suggestion
+              <SuggestionItem
                 key={term}
-                searchText={searchText}
                 onClick={selectTerm}
                 onKeyDown={whenEnterIsPressed(selectTerm)}>
-                <SuggestionText suggestion={`${term} (${resultCount})`} />
-              </Suggestion>
+                <Suggest suggestion={suggestionText} />
+              </SuggestionItem>
             );
           })}
         </SuggestionList>

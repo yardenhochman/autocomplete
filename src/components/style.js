@@ -34,7 +34,7 @@ export const SearchBar = styled.input.attrs({
   }
 `;
 
-export const Suggestion = styled.li.attrs({
+export const SuggestionItem = styled.li.attrs({
   tabIndex: 0,
 })`
   max-width: 800px;
