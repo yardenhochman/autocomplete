@@ -1,11 +1,13 @@
 import React, { useState, useCallback, useEffect } from 'react';
+import { bool } from 'prop-types';
+import { withContext } from '../context';
 import { SearchBar, Page } from './style';
 import BoldMatchingText from './SuggestionText';
 import useFocusControl from './useFocusControl';
 import Suggestions from './Suggestions';
 import { fetcher } from './util';
 
-function Search() {
+const Search = ({ version2 }) => {
   const [searchText, setSearchText] = useState('');
   const [results, setResults] = useState([]);
   const [showSuggestions, triggerSuggestions] = useState(false);
@@ -14,12 +16,12 @@ function Search() {
   const fetchSuggestions = React.useCallback(fetcher(setResults), []);
 
   useEffect(() => {
-    if (searchText.length > 2) {
+    if (showSuggestions && searchText.length > 2) {
       fetchSuggestions(searchText);
     } else {
       setResults([]);
     }
-  }, [searchText]);
+  }, [searchText, fetchSuggestions, showSuggestions]);
 
   const setShowSuggestions = () => {
     if (results) {
@@ -30,13 +32,14 @@ function Search() {
 
   const selectSuggestion = term => {
     setSearchText(term);
-    triggerSuggestions(false);
-    setResults([]);
+    if (!version2) {
+      setResults([]);
+      triggerSuggestions(false);
+    }
     focusElement();
   };
 
   const SuggestionText = useCallback(() => BoldMatchingText(searchText), [results]);
-
   return (
     <Page>
       <SearchBar
@@ -44,10 +47,17 @@ function Search() {
         value={searchText}
         onKeyUp={setShowSuggestions}
         ref={ref}
+        noClear={version2}
       />
-      {showSuggestions && <Suggestions {...{ results, SuggestionText, selectSuggestion }} />}
+      {showSuggestions && (
+        <Suggestions {...{ results, SuggestionText, selectSuggestion }} withArrows={version2} />
+      )}
     </Page>
   );
-}
+};
 
-export default Search;
+export default withContext(Search);
+
+Search.propTypes = {
+  version2: bool,
+};

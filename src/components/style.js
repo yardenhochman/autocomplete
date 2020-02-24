@@ -1,4 +1,4 @@
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import searchIcon from './search_icon.svg';
 
 export const Page = styled.div`
@@ -25,6 +25,11 @@ export const SearchBar = styled.input.attrs({
     border: black solid 1px;
   }
   ::-webkit-search-cancel-button {
+    ${({ noClear }) =>
+      noClear &&
+      css`
+        display: none;
+      `};
     -webkit-appearance: searchfield-cancel-button;
     position: relative;
     right: 30px;
@@ -43,11 +48,20 @@ export const SuggestionItem = styled.li.attrs({
   list-style-type: none;
   text-align: left;
   border: solid 0.5px gray;
-
   box-sizing: border-box;
+  display: flex;
 
-  & span {
+  ${({ version2 }) =>
+    !version2 &&
+    css`
+      cursor: pointer;
+    `}
+
+  > & span {
     padding: 0 10px;
+  }
+  & > svg {
+    cursor: pointer;
   }
 `;
 

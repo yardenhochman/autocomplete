@@ -29,6 +29,8 @@ module.exports = {
     },
     rules: {
       "arrow-parens":["error","as-needed"],
+      "react-hooks/rules-of-hooks": "error",
+      "react-hooks/exhaustive-deps": "warn",
       "prettier/prettier": [
         "error",
         {
