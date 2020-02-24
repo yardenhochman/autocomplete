@@ -1,10 +1,9 @@
-import { debounce } from 'lodash';
 import React, { useState, useCallback, useEffect } from 'react';
-import { fetchSearchOptionsAutocomplete, includesText } from './util';
 import { SearchBar, Page } from './style';
 import BoldMatchingText from './SuggestionText';
 import useFocusControl from './useFocusControl';
 import Suggestions from './Suggestions';
+import { fetcher } from './util';
 
 function Search() {
   const [searchText, setSearchText] = useState('');
@@ -12,13 +11,7 @@ function Search() {
   const [showSuggestions, triggerSuggestions] = useState(false);
   const [ref, focusElement] = useFocusControl();
 
-  const fetchSuggestions = React.useCallback(
-    debounce(async value => {
-      const { data: listOfTermObjects } = await fetchSearchOptionsAutocomplete(value);
-      setResults(listOfTermObjects.filter(includesText(value)));
-    }, 300),
-    [],
-  );
+  const fetchSuggestions = React.useCallback(fetcher(setResults), []);
 
   useEffect(() => {
     if (searchText.length > 2) {

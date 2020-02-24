@@ -1,5 +1,5 @@
 import React from 'react';
-import { arrayOf, number, string, func } from 'prop-types';
+import { shape, arrayOf, number, string, func } from 'prop-types';
 import { whenEnterIsPressed } from './util';
 import { SuggestionList, SuggestionItem } from './style';
 
@@ -28,8 +28,10 @@ export default Suggestions;
 Suggestions.propTypes = {
   SuggestionText: func,
   selectSuggestion: func,
-  results: arrayOf({
-    resultCount: number,
-    term: string,
-  }),
+  results: arrayOf(
+    shape({
+      resultCount: number,
+      term: string,
+    }),
+  ),
 };

@@ -1,9 +1,7 @@
 import React from 'react';
 
 const BoldMatchingText = searchText => ({ suggestion }) => {
-  const startBoldIndex = suggestion
-    .toLowerCase()
-    .indexOf(searchText.toLowerCase());
+  const startBoldIndex = suggestion.toLowerCase().indexOf(searchText.toLowerCase());
   const endBoldIndex = startBoldIndex + searchText.length;
   return (
     <>
