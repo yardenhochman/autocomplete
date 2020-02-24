@@ -16,19 +16,14 @@ const Search = ({ version2 }) => {
   const fetchSuggestions = React.useCallback(fetcher(setResults), []);
 
   useEffect(() => {
+    console.log(searchText, showSuggestions);
+
     if (showSuggestions && searchText.length > 2) {
       fetchSuggestions(searchText);
     } else {
       setResults([]);
     }
   }, [searchText, fetchSuggestions, showSuggestions]);
-
-  const setShowSuggestions = () => {
-    if (results) {
-      return triggerSuggestions(true);
-    }
-    return triggerSuggestions(false);
-  };
 
   const selectSuggestion = term => {
     setSearchText(term);
@@ -42,10 +37,11 @@ const Search = ({ version2 }) => {
   const SuggestionText = useCallback(() => BoldMatchingText(searchText), [results]);
   return (
     <Page>
+      <h1>{results}</h1>
       <SearchBar
         onChange={({ target: { value } }) => setSearchText(value)}
         value={searchText}
-        onKeyUp={setShowSuggestions}
+        onKeyUp={() => triggerSuggestions(true)}
         ref={ref}
         noClear={version2}
       />

@@ -13,6 +13,7 @@ export const SearchBar = styled.input.attrs({
   autoComplete: 'off',
   type: 'search',
   name: 'search',
+  'aria-label': 'search',
 })`
   background: url(${searchIcon}) 99% no-repeat;
   margin-top: 20px;
@@ -67,6 +68,7 @@ export const SuggestionItem = styled.li.attrs({
 
 export const SuggestionList = styled.ul.attrs(() => ({
   role: 'listbox',
+  'data-testid': 'suggestions-list',
 }))`
   margin: 0;
   padding: 0;
