@@ -1,84 +1,58 @@
 import { debounce } from 'lodash';
-import React, { useState, useCallback, useEffect, useRef } from 'react';
-import {
-  fetchSearchOptionsAutocomplete,
-  includesText,
-  whenEnterIsPressed,
-} from './util';
-import { SearchBar, Page, SuggestionList, SuggestionItem } from './style';
+import React, { useState, useCallback, useEffect } from 'react';
+import { fetchSearchOptionsAutocomplete, includesText } from './util';
+import { SearchBar, Page } from './style';
 import BoldMatchingText from './SuggestionText';
+import useFocusControl from './useFocusControl';
+import Suggestions from './Suggestions';
 
 function Search() {
   const [searchText, setSearchText] = useState('');
   const [results, setResults] = useState([]);
-  const [showResults, triggerShowResults] = useState(false);
+  const [showSuggestions, triggerSuggestions] = useState(false);
+  const [ref, focusElement] = useFocusControl();
 
-  const searchRef = useRef();
-
-  const focusSearch = () => searchRef.current && searchRef.current.focus();
+  const fetchSuggestions = React.useCallback(
+    debounce(async value => {
+      const { data: listOfTermObjects } = await fetchSearchOptionsAutocomplete(value);
+      setResults(listOfTermObjects.filter(includesText(value)));
+    }, 300),
+    [],
+  );
 
   useEffect(() => {
-    focusSearch();
-  }, []);
-
-  const fetchSuggestions = debounce(async value => {
-    const { data: listOfTermObjects } = await fetchSearchOptionsAutocomplete(
-      value,
-    );
-    setResults(listOfTermObjects.filter(includesText(value)));
-  }, 300);
-
-  const onChange = ({ target: { value } }) => {
-    setSearchText(value);
-    if (value.length <= 2) {
-      return setResults([]);
+    if (searchText.length > 2) {
+      fetchSuggestions(searchText);
+    } else {
+      setResults([]);
     }
-    return fetchSuggestions(value);
-  };
+  }, [searchText]);
 
-  const showSuggestions = () => {
+  const setShowSuggestions = () => {
     if (results) {
-      return triggerShowResults(true);
+      return triggerSuggestions(true);
     }
-    return triggerShowResults(false);
+    return triggerSuggestions(false);
   };
 
   const selectSuggestion = term => {
     setSearchText(term);
-    triggerShowResults(false);
+    triggerSuggestions(false);
     setResults([]);
-    focusSearch();
+    focusElement();
   };
 
-  const SuggestionText = useCallback(() => BoldMatchingText(searchText), [
-    results,
-  ]);
+  const SuggestionText = useCallback(() => BoldMatchingText(searchText), [results]);
 
   return (
     <Page>
       <SearchBar
-        onChange={onChange}
+        onChange={({ target: { value } }) => setSearchText(value)}
         value={searchText}
-        onKeyUp={showSuggestions}
-        ref={searchRef}
+        onKeyUp={setShowSuggestions}
+        ref={ref}
       />
-      {showResults && (
-        <SuggestionList>
-          {results.map(({ resultCount, term }) => {
-            const Suggest = SuggestionText();
-            const suggestionText = `${term} (${resultCount})`;
-            const selectTerm = () => selectSuggestion(suggestionText);
-            return (
-              <SuggestionItem
-                key={term}
-                onClick={selectTerm}
-                onKeyDown={whenEnterIsPressed(selectTerm)}>
-                <Suggest suggestion={suggestionText} />
-              </SuggestionItem>
-            );
-          })}
-        </SuggestionList>
-      )}
+      {showSuggestions && <Suggestions {...{ results, SuggestionText, selectSuggestion }} />}
     </Page>
   );
 }
