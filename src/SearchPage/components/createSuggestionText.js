@@ -1,7 +1,7 @@
 import React from 'react';
 import { memoize } from 'lodash';
 
-const BoldMatchingText = memoize(
+const createSuggestionText = memoize(
   searchText => ({ suggestion }) => {
     const startBoldIndex = suggestion.toLowerCase().indexOf(searchText.toLowerCase());
     const endBoldIndex = startBoldIndex + searchText.length;
@@ -18,4 +18,4 @@ const BoldMatchingText = memoize(
   (searchText, results) => results.length,
 );
 
-export default BoldMatchingText;
+export default createSuggestionText;

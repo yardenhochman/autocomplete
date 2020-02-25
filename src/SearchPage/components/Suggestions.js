@@ -1,9 +1,9 @@
 import React from 'react';
 import { shape, arrayOf, number, string, func, bool } from 'prop-types';
-import { whenEnterIsPressed } from '../utils';
+import { whenEnterIsPressed } from 'utils';
+import { ArrowSVG } from 'icons';
+import { withContext } from 'context';
 import { SuggestionList, SuggestionItem } from './style';
-import { ArrowSVG } from '../icons';
-import { withContext } from '../context';
 
 const Suggestions = ({ results, SuggestionText, selectSuggestion, version2 }) => (
   <SuggestionList>

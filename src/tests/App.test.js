@@ -1,8 +1,8 @@
 import React from 'react';
 import { render, fireEvent } from '@testing-library/react';
 // import axiosMock from 'axios';
-import App from './components/SearchPage';
-import { Provider } from './context';
+import App from 'SearchPage';
+import { Provider } from 'context';
 // jest.mock('axios');
 
 jest.mock('./components/util', () => ({

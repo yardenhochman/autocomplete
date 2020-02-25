@@ -1,10 +1,9 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { bool } from 'prop-types';
-import { withContext } from '../context';
+import { withContext } from 'context';
+import { suggestionFetcher, useFocusControl } from 'utils';
+import { createSuggestionText, Suggestions } from './components';
 import { SearchBar, Page } from './style';
-import BoldMatchingText from './SuggestionText';
-import Suggestions from './Suggestions';
-import { suggestionFetcher, useFocusControl } from '../utils';
 
 const Search = ({ version2 }) => {
   const [searchText, setSearchText] = useState('');
@@ -31,7 +30,7 @@ const Search = ({ version2 }) => {
     focusElement();
   };
 
-  const SuggestionText = useCallback(() => BoldMatchingText(searchText, results), [
+  const SuggestionText = useCallback(() => createSuggestionText(searchText, results), [
     searchText,
     results,
   ]);
