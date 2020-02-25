@@ -30,10 +30,8 @@ const Search = ({ version2 }) => {
     focusElement();
   };
 
-  const SuggestionText = useCallback(() => createSuggestionText(searchText, results), [
-    searchText,
-    results,
-  ]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const SuggestionText = useCallback(() => createSuggestionText(searchText), [results]);
   return (
     <Page>
       <SearchBar
