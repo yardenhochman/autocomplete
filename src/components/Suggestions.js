@@ -1,11 +1,11 @@
 import React from 'react';
 import { shape, arrayOf, number, string, func, bool } from 'prop-types';
-import { whenEnterIsPressed } from './util';
+import { whenEnterIsPressed } from '../utils';
 import { SuggestionList, SuggestionItem } from './style';
-import ArrowSVG from './icons/arrow';
+import { ArrowSVG } from '../icons';
 import { withContext } from '../context';
 
-const Suggestions = ({ results, SuggestionText, selectSuggestion, withArrows, version2 }) => (
+const Suggestions = ({ results, SuggestionText, selectSuggestion, version2 }) => (
   <SuggestionList>
     {results.map(({ resultCount, term }) => {
       const Suggest = SuggestionText();
@@ -16,7 +16,7 @@ const Suggestions = ({ results, SuggestionText, selectSuggestion, withArrows, ve
           key={term}
           onClick={version2 ? selectTerm : undefined}
           onKeyDown={whenEnterIsPressed(selectTerm)}>
-          {withArrows && <ArrowSVG onClick={selectTerm} />}
+          {version2 && <ArrowSVG onClick={selectTerm} />}
           <Suggest suggestion={version2 ? term : `${term} (${resultCount})`} />
         </SuggestionItem>
       );
@@ -29,7 +29,6 @@ export default withContext(Suggestions);
 Suggestions.propTypes = {
   SuggestionText: func,
   selectSuggestion: func,
-  withArrows: bool,
   version2: bool,
   results: arrayOf(
     shape({

@@ -1,5 +1,5 @@
 import styled, { css } from 'styled-components';
-import searchIcon from './search_icon.svg';
+import { SearchSVG } from '../icons';
 
 export const Page = styled.div.attrs({
   'data-testid': 'page-wrapper',
@@ -18,7 +18,7 @@ export const SearchBar = styled.input.attrs({
   'aria-label': 'search',
   'data-testid': 'search-bar-input',
 })`
-  background: url(${searchIcon}) 99% no-repeat;
+  background: url(${SearchSVG}) 99% no-repeat;
   margin-top: 20px;
   background-size: 20px;
   padding: 8px;
