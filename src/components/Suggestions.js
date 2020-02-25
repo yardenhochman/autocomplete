@@ -5,27 +5,24 @@ import { SuggestionList, SuggestionItem } from './style';
 import ArrowSVG from './icons/arrow';
 import { withContext } from '../context';
 
-const Suggestions = ({ results, SuggestionText, selectSuggestion, withArrows, version2 }) => {
-  return (
-    <SuggestionList>
-      {results.map(({ resultCount, term }) => {
-        const Suggest = SuggestionText();
-        const suggestionText = version2 ? term : `${term} (${resultCount})`;
-        const selectTerm = () => selectSuggestion(term);
-        return (
-          <SuggestionItem
-            version2={version2}
-            key={term}
-            onClick={version2 ? selectTerm : undefined}
-            onKeyDown={whenEnterIsPressed(selectTerm)}>
-            {withArrows && <ArrowSVG onClick={selectTerm} />}
-            <Suggest suggestion={suggestionText} />
-          </SuggestionItem>
-        );
-      })}
-    </SuggestionList>
-  );
-};
+const Suggestions = ({ results, SuggestionText, selectSuggestion, withArrows, version2 }) => (
+  <SuggestionList>
+    {results.map(({ resultCount, term }) => {
+      const Suggest = SuggestionText();
+      const selectTerm = () => selectSuggestion(term);
+      return (
+        <SuggestionItem
+          version2={version2}
+          key={term}
+          onClick={version2 ? selectTerm : undefined}
+          onKeyDown={whenEnterIsPressed(selectTerm)}>
+          {withArrows && <ArrowSVG onClick={selectTerm} />}
+          <Suggest suggestion={version2 ? term : `${term} (${resultCount})`} />
+        </SuggestionItem>
+      );
+    })}
+  </SuggestionList>
+);
 
 export default withContext(Suggestions);
 

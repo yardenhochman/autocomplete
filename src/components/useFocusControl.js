@@ -1,11 +1,13 @@
 import { useRef, useEffect } from 'react';
 
-const useFocusControl = () => {
+const useFocusControl = ({ onLoad }) => {
   const ref = useRef();
   const focusElement = () => ref.current && ref.current.focus();
   useEffect(() => {
-    focusElement();
-  }, []);
+    if (onLoad) {
+      focusElement();
+    }
+  }, [onLoad]);
 
   return [ref, focusElement];
 };

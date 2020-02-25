@@ -11,13 +11,11 @@ const Search = ({ version2 }) => {
   const [searchText, setSearchText] = useState('');
   const [results, setResults] = useState([]);
   const [showSuggestions, triggerSuggestions] = useState(false);
-  const [ref, focusElement] = useFocusControl();
+  const [ref, focusElement] = useFocusControl({ onload: true });
 
   const fetchSuggestions = React.useCallback(fetcher(setResults), []);
 
   useEffect(() => {
-    console.log(searchText, showSuggestions);
-
     if (showSuggestions && searchText.length > 2) {
       fetchSuggestions(searchText);
     } else {

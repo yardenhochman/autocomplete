@@ -1,7 +1,9 @@
 import styled, { css } from 'styled-components';
 import searchIcon from './search_icon.svg';
 
-export const Page = styled.div`
+export const Page = styled.div.attrs({
+  'data-testid': 'page-wrapper',
+})`
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -14,6 +16,7 @@ export const SearchBar = styled.input.attrs({
   type: 'search',
   name: 'search',
   'aria-label': 'search',
+  'data-testid': 'search-bar-input',
 })`
   background: url(${searchIcon}) 99% no-repeat;
   margin-top: 20px;
@@ -41,6 +44,7 @@ export const SearchBar = styled.input.attrs({
 `;
 
 export const SuggestionItem = styled.li.attrs({
+  'data-testid': 'suggestion-li',
   tabIndex: 0,
 })`
   max-width: 800px;
