@@ -1,142 +1,150 @@
 import React from 'react';
-import { render, fireEvent } from '@testing-library/react';
-// import axiosMock from 'axios';
+import { render, fireEvent, getNodeText } from '@testing-library/react';
 import SearchPage from 'SearchPage';
-// import { Provider } from 'context';
-// jest.mock('axios');
+import axios from 'axios';
+import { act } from 'react-dom/test-utils';
+import { Provider } from 'context';
 
-jest.mock('utils', () => ({
-  fetcher: () => () => [
+jest.mock('axios');
+
+jest.mock('lodash', () => ({
+  debounce: fn => fn,
+}));
+
+const apiResponse = {
+  data: [
     { term: 'Abyssinian', resultCount: 61 },
     { term: 'Aegean', resultCount: 26 },
     { term: 'American Curl', resultCount: 56 },
     { term: 'American Bobtail', resultCount: 3 },
     { term: 'American Shorthair', resultCount: 26 },
   ],
-}));
+};
 
-const setup = () => {
-  const utils = render(<SearchPage />);
+const setup = version2 => {
+  const utils = render(
+    <Provider value={{ version2 }}>
+      <SearchPage />
+    </Provider>,
+  );
   const input = utils.getByLabelText('search');
 
   return {
     input,
     ...utils,
     fillInput: testInput => fireEvent.change(input, { target: { value: testInput } }),
-    getListItem: () => utils.getByTestId('suggestion-li'),
+    getListItems: () => utils.getAllByTestId('suggestion-li'),
+    getSuggestionArrows: () => utils.getAllByTestId('suggestion-arrow-svg'),
+    queryListItem: () => utils.queryByTestId('suggestion-li'),
+    keyUp: async () => {
+      await act(async () => {
+        fireEvent.keyUp(input);
+      });
+    },
   };
 };
 
-// const setupVersion2 = () => {
-//   const utils = render(
-//     <Provider value={{ version2: true }}>
-//       <App />
-//     </Provider>,
-//   );
-//   const input = utils.getByLabelText('search');
-
-//   return {
-//     input,
-//     ...utils,
-//     fillInput: testInput => fireEvent.change(input, { target: { value: testInput } }),
-//     getListItem: () => utils.getByTestId('suggestion-li'),
-//   };
-// };
-
 test('input works', () => {
   const { input, fillInput } = setup();
-  fillInput('a');
+  act(() => {
+    fillInput('a');
+  });
   expect(input.value).toBe('a');
 });
-/*
 test('when input string is under 3 char - no suggestions', () => {
-  const { input, fillInput, getListItem } = setup();
+  const { input, fillInput, queryListItem } = setup();
   fillInput('Am');
   fireEvent.keyUp(input);
-  // to be fixed
-  expect(getListItem()).toBeEmpty();
+  expect(queryListItem()).toBeNull();
 });
-test('when input string is 3 char and there are matches. show suggestions', () => {
-  const { input, getListItem, fillInput } = setup();
+test('when input string is 3 char and there are matches. show suggestions', async () => {
+  const { keyUp, getListItems, fillInput } = setup();
   fillInput('Ame');
-  fireEvent.keyUp(input);
-  // to be fixed
-  expect(getListItem()).not.toBeEmpty();
+  axios.get.mockResolvedValue(apiResponse);
+  await keyUp();
+  expect(axios.get).toHaveBeenCalled();
+  expect(getListItems()).toBeDefined();
 });
-test('when input string is 3 char and then 2 again. hide suggestions', () => {
-  const { input, getListItem, fillInput } = setup();
+test('when input string is 3 char and then 2 again. hide suggestions', async () => {
+  const { keyUp, queryListItem, fillInput } = setup();
   fillInput('Am');
-  fireEvent.keyUp(input);
-  // to be fixed
-  expect(getListItem()).toBeEmpty();
+  await keyUp();
+  expect(queryListItem()).toBeNull();
 });
-test('when a suggestion is clicked', () => {
-  const { input, getListItem, fillInput } = setup();
+test('when a suggestion is clicked', async () => {
+  const { keyUp, getListItems, queryListItem, fillInput, input } = setup();
   fillInput('Ame');
-  fireEvent.keyUp(input);
-  // to be fixed
-  fireEvent.click(getListItem());
-  expect(input.value).toBe('Abyssinian'); // picked suggestion is placed into input field
-  expect(getListItem()).toBeEmpty(); // suggestions are hidden after the click
+  await keyUp();
+  act(() => {
+    fireEvent.click(getListItems()[0]);
+  });
+  expect(input.value).toBe('American Curl'); // picked suggestion is placed into input field
+  expect(queryListItem()).toBeNull(); // suggestions are hidden after the click
 });
-test('when a suggestion is selected via enter', () => {
-  const { input, getListItem, fillInput } = setup();
+test('when a suggestion is selected via enter', async () => {
+  const { input, getListItems, fillInput, keyUp } = setup();
   fillInput('Ame');
-  expect(input.value).toBe('Ame');
-  fireEvent.keyUp(input);
-  // to be fixed
-  // fireevent: focus selection. press enter. expect same result as above
-  expect(input.value).toBe('Abyssinian');
-  expect(getListItem()).toBeEmpty();
+  await keyUp();
+  act(() => {
+    fireEvent.keyDown(getListItems()[0], {
+      key: 'Enter',
+      code: 13,
+      which: 13,
+      keyCode: 13,
+      charCode: 13,
+    });
+  });
+  expect(input.value).toBe('American Curl');
 });
-test('check bold suggestion text matches input', () => {
-  const { input, fillInput } = setup();
-  expect(getListItemBoldText()).toBe(input.text());
-});
-test('ensure input is focused', () => {
-  const { getListItem } = setup();
-  expect(getListItem()).toBeFocused(); // ?
+test('check bold suggestion text matches input', async () => {
+  const { getAllByTestId, fillInput, keyUp } = setup();
+  fillInput('Ame');
+  await keyUp();
+  expect(getNodeText(getAllByTestId('bold-text')[0])).toBe('Ame');
 });
 test('version2: input works', () => {
-  const { fillInput, input } = setupVersion2();
+  const { fillInput, input } = setup(true);
   fillInput('a');
   expect(input.value).toBe('a');
 });
 test('version2: when input string is under 3 char - no suggestions', () => {
-  const { input, fillInput, getListItem } = setupVersion2();
+  const { input, fillInput, queryListItem } = setup(true);
   fillInput('Am');
   fireEvent.keyUp(input);
-  // to be fixed
-  expect(getListItem()).toBeEmpty();
+  expect(queryListItem()).toBeNull();
 });
-test('version2:  when input string is 3 char and then 2 again. hide suggestions', () => {
-  const { input, getListItem, fillInput } = setupVersion2();
+test('version2:  when input string is 3 char and then 2 again. hide suggestions', async () => {
+  const { keyUp, queryListItem, fillInput } = setup(true);
   fillInput('Am');
-  fireEvent.keyUp(input);
-  // to be fixed
-  expect(getListItem()).toBeEmpty();
+  await keyUp();
+  expect(queryListItem()).toBeNull();
 });
-test('version2: when a suggestion is clicked', () => {
-  const { input, getListItem, fillInput } = setup();
+test('version2: when a suggestion is clicked', async () => {
+  const { keyUp, getSuggestionArrows, getListItems, fillInput, input } = setup(true);
   fillInput('Ame');
-  fireEvent.keyUp(input);
-  // to be fixed
-  fireEvent.click(getListItem());
-  expect(input.value).toBe('Abyssinian'); // picked suggestion is placed into input field
-  expect(getListItem()).not.toBeEmpty(); // suggestions are hidden after the click
+  await keyUp();
+  act(() => {
+    fireEvent.click(getSuggestionArrows()[0]);
+  });
+  await keyUp();
+
+  expect(input.value).toBe('American Curl');
+  expect(getListItems()).toBeDefined();
 });
-test('version2: when a suggestion is selected via enter', () => {
-  const { input, getListItem, fillInput } = setup();
+test('version2: when a suggestion is selected via enter', async () => {
+  const { input, getSuggestionArrows, getListItems, fillInput, keyUp } = setup(true);
   fillInput('Ame');
-  expect(input.value).toBe('Ame');
-  fireEvent.keyUp(input);
-  // to be fixed
-  // fireevent: focus selection. press enter. expect same result as above
-  expect(input.value).toBe('Abyssinian');
-  expect(getListItem()).not.toBeEmpty();
+  await keyUp();
+  act(() => {
+    fireEvent.keyDown(getSuggestionArrows()[0], {
+      key: 'Enter',
+      code: 13,
+      which: 13,
+      keyCode: 13,
+      charCode: 13,
+    });
+  });
+  await keyUp();
+  expect(input.value).toBe('American Curl');
+  expect(getListItems()).toBeDefined();
 });
-test('version2: ensure input is focused', () => {
-  const { getListItem } = setup();
-  expect(getListItem()).toBeFocused(); // ?
-});
-*/

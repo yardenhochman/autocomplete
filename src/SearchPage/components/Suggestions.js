@@ -14,7 +14,7 @@ const Suggestions = ({ results, SuggestionText, selectSuggestion, version2 }) =>
         <SuggestionItem
           version2={version2}
           key={term}
-          onClick={version2 ? selectTerm : undefined}
+          onClick={!version2 ? selectTerm : undefined}
           onKeyDown={whenEnterIsPressed(selectTerm)}>
           {version2 && <ArrowSVG onClick={selectTerm} />}
           <Suggest suggestion={version2 ? term : `${term} (${resultCount})`} />

@@ -1,7 +1,9 @@
 import React from 'react';
 
-const ArrowSVG = () => (
+const ArrowSVG = props => (
   <svg
+    {...props}
+    data-testid="suggestion-arrow-svg"
     id="Capa_1"
     enableBackground="new 0 0 320.941 320.941"
     height="20"

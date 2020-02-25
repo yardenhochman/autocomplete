@@ -6,7 +6,7 @@ import SearchPage from 'SearchPage';
 import * as serviceWorker from './serviceWorker';
 
 ReactDOM.render(
-  <Provider value={{ version2: false }}>
+  <Provider value={{ version2: true }}>
     <SearchPage />
   </Provider>,
   document.getElementById('root'),

@@ -29,7 +29,6 @@ const Search = ({ version2 }) => {
     }
     focusElement();
   };
-
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const SuggestionText = useCallback(() => createSuggestionText(searchText), [results]);
   return (
